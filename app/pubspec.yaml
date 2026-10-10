@@ -1,21 +1,20 @@
-
-name: goalstream
-description: GoalStream football streaming app
+name: futrivo_tv
+description: FUTRIVO TV multi-sport discovery and streaming app
 publish_to: "none"
-version: 1.0.0+1
+version: 1.0.0+2
 
 environment:
-  sdk: ">=3.3.0 <4.0.0"
+sdk: ">=3.3.0 <4.0.0"
 
 dependencies:
-  flutter:
-    sdk: flutter
-  video_player: ^2.10.0
+flutter:
+sdk: flutter
+video_player: ^2.10.0
 
 dev_dependencies:
-  flutter_test:
-    sdk: flutter
-  flutter_lints: ^5.0.0
+flutter_test:
+sdk: flutter
+flutter_lints: ^5.0.0
 
 flutter:
-  uses-material-design: true
+uses-material-design: true
