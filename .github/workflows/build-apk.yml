@@ -1,0 +1,67 @@
+
+name: Build GoalStream APK
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "app/**"
+      - ".github/workflows/build-apk.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Install Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Install Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Create Android project
+        run: |
+          flutter create buildsrc \
+            --project-name goalstream \
+            --org com.goalstream \
+            --platforms android
+
+          cp app/pubspec.yaml buildsrc/pubspec.yaml
+          cp app/lib/main.dart buildsrc/lib/main.dart
+
+      - name: Add internet permission
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path("buildsrc/android/app/src/main/AndroidManifest.xml")
+          s = p.read_text()
+          permission = '    <uses-permission android:name="android.permission.INTERNET"/>'
+          if "android.permission.INTERNET" not in s:
+              s = s.replace("<application", permission + "\n    <application", 1)
+          p.write_text(s)
+          PY
+
+      - name: Build APK
+        run: |
+          cd buildsrc
+          flutter pub get
+          flutter build apk --release
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: GoalStream-Android-APK
+          path: buildsrc/build/app/outputs/flutter-apk/app-release.apk
+          if-no-files-found: error
+          retention-days: 7
